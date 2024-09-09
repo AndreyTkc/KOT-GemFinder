@@ -4,7 +4,8 @@ from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6 import QtGui
-from main_window_ui import Ui_MainWindow
+from Windows.main_window_ui import Ui_MainWindow
+import Icons.icons_rc
 import cv2
 import numpy as np
 import pyautogui
@@ -121,23 +122,23 @@ class MainWindow(QMainWindow):
         if obj == self.ui.CloseBtn:
             if ev.type() == QEvent.Enter:
                 icon = QIcon()
-                icon.addFile(":/Close/icons/close_hover.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+                icon.addFile(":Close/icons/close_hover.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
                 self.ui.CloseBtn.setIcon(icon)
                 self.ui.CloseBtn.setIconSize(QSize(20, 20))
             elif ev.type() == QEvent.Leave:
                 icon = QIcon()
-                icon.addFile(":/Close/icons/close.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+                icon.addFile(":Close/icons/close.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
                 self.ui.CloseBtn.setIcon(icon)
                 self.ui.CloseBtn.setIconSize(QSize(20, 20))
         elif obj == self.ui.MinimizeBtn:
             if ev.type() == QEvent.Enter:
                 icon = QIcon()
-                icon.addFile(":/Minimize/icons/minimize_hover.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+                icon.addFile(":Minimize/icons/minimize_hover.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
                 self.ui.MinimizeBtn.setIcon(icon)
                 self.ui.MinimizeBtn.setIconSize(QSize(20, 20))
             elif ev.type() == QEvent.Leave:
                 icon = QIcon()
-                icon.addFile(":/Minimize/icons/minimize.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+                icon.addFile(":Minimize/icons/minimize.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
                 self.ui.MinimizeBtn.setIcon(icon)
                 self.ui.MinimizeBtn.setIconSize(QSize(20, 20))
         elif obj == self.ui.SuccessKey and self.is_frozen:
@@ -263,7 +264,7 @@ class MainWindow(QMainWindow):
             getattr(self.ui, self.add_button).setText(self.file_name)
             getattr(self.ui, self.path_label).setText(self.file_path)
             icon = QIcon()
-            icon.addFile(u":/Remove/icons/remove.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+            icon.addFile(":Remove/icons/remove.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
             getattr(self.ui, self.remove_button).setIcon(icon)
             getattr(self.ui, self.remove_button).setIconSize(QSize(15, 15))
             getattr(self.ui, self.remove_button).setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
@@ -312,7 +313,7 @@ class MainWindow(QMainWindow):
             getattr(self.ui, self.current_add_button).setText(self.next_add_button_text)
             getattr(self.ui, self.current_path_label).setText(self.next_path_label_text)
             icon = QIcon()
-            icon.addFile(u":/Remove/icons/remove.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+            icon.addFile(":Remove/icons/remove.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
             getattr(self.ui, self.current_remove_button).setIcon(icon)
             getattr(self.ui, self.current_remove_button).setIconSize(QSize(15, 15))
             getattr(self.ui, self.current_remove_button).setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
@@ -372,7 +373,7 @@ class MainWindow(QMainWindow):
                     self.data["s_key"] = ""
                 else:
                     if key_text:
-                        self.ui.SuccessKey.setStyleSheet(u"#SuccessKey {\n"
+                        self.ui.SuccessKey.setStyleSheet("#SuccessKey {\n"
                                                     "background-color: rgba(0, 0, 0, 0.4);\n"
                                                     "border-radius: 8px;\n"
                                                     "font: 12pt \"Sitka\";\n"
@@ -384,7 +385,7 @@ class MainWindow(QMainWindow):
                         self.data["s_key"] = key_text.upper()
                         self.update_status()
                     else:
-                        self.ui.SuccessKey.setStyleSheet(u"#SuccessKey {\n"
+                        self.ui.SuccessKey.setStyleSheet("#SuccessKey {\n"
                                                     "background-color: rgba(0, 0, 0, 0.4);\n"
                                                     "border-radius: 8px;\n"
                                                     "font: 8pt \"Sitka\";\n"
@@ -406,7 +407,7 @@ class MainWindow(QMainWindow):
                     self.data["f_key"] = ""
                 else:
                     if key_text:
-                        self.ui.FalseKey.setStyleSheet(u"#FalseKey {\n"
+                        self.ui.FalseKey.setStyleSheet("#FalseKey {\n"
                                                     "background-color: rgba(0, 0, 0, 0.4);\n"
                                                     "border-radius: 8px;\n"
                                                     "font: 12pt \"Sitka\";\n"
@@ -418,7 +419,7 @@ class MainWindow(QMainWindow):
                         self.data["f_key"] = key_text.upper()
                         self.update_status()
                     else:
-                        self.ui.FalseKey.setStyleSheet(u"#FalseKey {\n"
+                        self.ui.FalseKey.setStyleSheet("#FalseKey {\n"
                                                     "background-color: rgba(0, 0, 0, 0.4);\n"
                                                     "border-radius: 8px;\n"
                                                     "font: 8pt \"Sitka\";\n"
@@ -447,7 +448,7 @@ class MainWindow(QMainWindow):
 
     def change_icon(self):
         icon = QIcon()
-        icon.addFile(u":/Done/icons/done.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        icon.addFile(":Done/icons/done.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.ui.SaveBtn.setIcon(icon)
         self.ui.SaveBtn.setText("Saved!")
         time.sleep(2)
@@ -491,7 +492,7 @@ class MainWindow(QMainWindow):
             getattr(self.ui, self.add_button).setText(self.file_name)
             getattr(self.ui, self.path_label).setText(self.data["file_paths"][self.i])
             icon = QIcon()
-            icon.addFile(u":/Remove/icons/remove.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+            icon.addFile(":Remove/icons/remove.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
             getattr(self.ui, self.remove_button).setIcon(icon)
             getattr(self.ui, self.remove_button).setIconSize(QSize(15, 15))
             getattr(self.ui, self.remove_button).setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
