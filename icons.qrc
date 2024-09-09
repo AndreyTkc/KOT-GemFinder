@@ -1,0 +1,31 @@
+<RCC>
+  <qresource prefix="WindowIcon">
+    <file>icons/icon.png</file>
+  </qresource>
+  <qresource prefix="Info">
+    <file>icons/info.png</file>
+  </qresource>
+  <qresource prefix="Done">
+    <file>icons/done.png</file>
+  </qresource>
+  <qresource prefix="Remove">
+    <file>icons/remove_hover.png</file>
+    <file>icons/remove.png</file>
+  </qresource>
+  <qresource prefix="Close">
+    <file>icons/close.png</file>
+    <file>icons/close_hover.png</file>
+    <file>icons/close_pressed.png</file>
+  </qresource>
+  <qresource prefix="Minimize">
+    <file>icons/minimize.png</file>
+    <file>icons/minimize_hover.png</file>
+    <file>icons/minimize_pressed.png</file>
+  </qresource>
+  <qresource prefix="Start">
+    <file>icons/start.png</file>
+  </qresource>
+  <qresource prefix="Stop">
+    <file>icons/stop.png</file>
+  </qresource>
+</RCC>
