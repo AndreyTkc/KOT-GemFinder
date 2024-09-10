@@ -1,5 +1,6 @@
 import os
 import ctypes
+import re
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
@@ -17,6 +18,7 @@ from concurrent.futures import ThreadPoolExecutor
 import pathlib
 from pathlib import Path
 import json
+from Keys.keys import keys
 
 
 class MainWindow(QMainWindow):
@@ -178,6 +180,11 @@ class MainWindow(QMainWindow):
                 elif self.ui.DelayInput.text() == "":
                     self.ui.DelayInput.setText("")
                     self.data["delay"] = 0.7
+                    self.ui.DelayInput.clearFocus()
+                    self.ui.TipDelayError.setHidden(True)
+                    return False
+                else:
+                    self.data["delay"] = float(self.ui.DelayInput.text().replace(",", "."))
                     self.ui.DelayInput.clearFocus()
                     self.ui.TipDelayError.setHidden(True)
                     return False
@@ -373,28 +380,39 @@ class MainWindow(QMainWindow):
                     self.data["s_key"] = ""
                 else:
                     if key_text:
-                        self.ui.SuccessKey.setStyleSheet("#SuccessKey {\n"
-                                                    "background-color: rgba(0, 0, 0, 0.4);\n"
-                                                    "border-radius: 8px;\n"
-                                                    "font: 12pt \"Sitka\";\n"
-                                                    "}\n"
-                                                    "#SuccessKey:hover {\n"
-                                                    "background-color: rgba(0, 0, 0, 0.25);\n"
-                                                    "}")
-                        self.ui.SuccessKey.setText(key_text.upper())
-                        self.data["s_key"] = key_text.upper()
-                        self.update_status()
-                    else:
-                        self.ui.SuccessKey.setStyleSheet("#SuccessKey {\n"
-                                                    "background-color: rgba(0, 0, 0, 0.4);\n"
-                                                    "border-radius: 8px;\n"
-                                                    "font: 8pt \"Sitka\";\n"
-                                                    "}\n"
-                                                    "#SuccessKey:hover {\n"
-                                                    "background-color: rgba(0, 0, 0, 0.25);\n"
-                                                    "}")
-                        self.ui.SuccessKey.setText(QKeySequence(key).toString())
-                        self.data["s_key"] = QKeySequence(key).toString()
+                        if key_text == '\r':
+                            self.ui.SuccessKey.setText('Return')
+                            self.data["s_key"] = 'Return'
+                            self.ui.SuccessKey.setStyleSheet("#SuccessKey {\n"
+                                                           "background-color: rgba(0, 0, 0, 0.4);\n"
+                                                           "border-radius: 8px;\n"
+                                                           "font: 8pt \"Sitka\";\n"
+                                                           "}\n"
+                                                           "#SuccessKey:hover {\n"
+                                                           "background-color: rgba(0, 0, 0, 0.25);\n"
+                                                           "}")
+                        elif key_text == '\b':
+                            self.ui.SuccessKey.setText('Backspace')
+                            self.data["s_key"] = 'Backspace'
+                            self.ui.SuccessKey.setStyleSheet("#SuccessKey {\n"
+                                                           "background-color: rgba(0, 0, 0, 0.4);\n"
+                                                           "border-radius: 8px;\n"
+                                                           "font: 8pt \"Sitka\";\n"
+                                                           "}\n"
+                                                           "#SuccessKey:hover {\n"
+                                                           "background-color: rgba(0, 0, 0, 0.25);\n"
+                                                           "}")
+                        else:
+                            self.ui.SuccessKey.setText(key_text.upper())
+                            self.data["s_key"] = key_text.upper()
+                            self.ui.SuccessKey.setStyleSheet("#SuccessKey {\n"
+                                                           "background-color: rgba(0, 0, 0, 0.4);\n"
+                                                           "border-radius: 8px;\n"
+                                                           "font: 12pt \"Sitka\";\n"
+                                                           "}\n"
+                                                           "#SuccessKey:hover {\n"
+                                                           "background-color: rgba(0, 0, 0, 0.25);\n"
+                                                           "}")
                         self.update_status()
                 self.tracking_success_key = False
         elif self.tracking_false_key:
@@ -407,37 +425,49 @@ class MainWindow(QMainWindow):
                     self.data["f_key"] = ""
                 else:
                     if key_text:
-                        self.ui.FalseKey.setStyleSheet("#FalseKey {\n"
-                                                    "background-color: rgba(0, 0, 0, 0.4);\n"
-                                                    "border-radius: 8px;\n"
-                                                    "font: 12pt \"Sitka\";\n"
-                                                    "}\n"
-                                                    "#FalseKey:hover {\n"
-                                                    "background-color: rgba(0, 0, 0, 0.25);\n"
-                                                    "}")
-                        self.ui.FalseKey.setText(key_text.upper())
-                        self.data["f_key"] = key_text.upper()
-                        self.update_status()
-                    else:
-                        self.ui.FalseKey.setStyleSheet("#FalseKey {\n"
-                                                    "background-color: rgba(0, 0, 0, 0.4);\n"
-                                                    "border-radius: 8px;\n"
-                                                    "font: 8pt \"Sitka\";\n"
-                                                    "}\n"
-                                                    "#FalseKey:hover {\n"
-                                                    "background-color: rgba(0, 0, 0, 0.25);\n"
-                                                    "}")
-                        self.ui.FalseKey.setText(QKeySequence(key).toString())
-                        self.data["f_key"] = QKeySequence(key).toString()
-                        self.update_status()
+                        if key_text != '\u007f':
+                            if key_text == '\r':
+                                self.ui.FalseKey.setText('Return')
+                                self.data["f_key"] = 'Return'
+                                self.ui.FalseKey.setStyleSheet("#FalseKey {\n"
+                                                               "background-color: rgba(0, 0, 0, 0.4);\n"
+                                                               "border-radius: 8px;\n"
+                                                               "font: 8pt \"Sitka\";\n"
+                                                               "}\n"
+                                                               "#FalseKey:hover {\n"
+                                                               "background-color: rgba(0, 0, 0, 0.25);\n"
+                                                               "}")
+                            elif key_text == '\b':
+                                self.ui.FalseKey.setText('Backspace')
+                                self.data["f_key"] = 'Backspace'
+                                self.ui.FalseKey.setStyleSheet("#FalseKey {\n"
+                                                               "background-color: rgba(0, 0, 0, 0.4);\n"
+                                                               "border-radius: 8px;\n"
+                                                               "font: 8pt \"Sitka\";\n"
+                                                               "}\n"
+                                                               "#FalseKey:hover {\n"
+                                                               "background-color: rgba(0, 0, 0, 0.25);\n"
+                                                               "}")
+                            else:
+                                self.ui.FalseKey.setText(key_text.upper())
+                                self.data["f_key"] = key_text.upper()
+                                self.ui.FalseKey.setStyleSheet("#FalseKey {\n"
+                                                               "background-color: rgba(0, 0, 0, 0.4);\n"
+                                                               "border-radius: 8px;\n"
+                                                               "font: 12pt \"Sitka\";\n"
+                                                               "}\n"
+                                                               "#FalseKey:hover {\n"
+                                                               "background-color: rgba(0, 0, 0, 0.25);\n"
+                                                               "}")
+                            self.update_status()
                 self.tracking_false_key = False
 
     def on_start_clicked(self):
         global is_enabled
         if not self.is_enabled:
             self.is_enabled = True
-            self.thread_pool.start(self.start)
-
+            # self.thread_pool.start(self.start)
+            self.start()
     def save_data(self):
         self.file_path = Path.home() / "AppData" / "Local" / "KOT Gem Finder"
         pathlib.Path(self.file_path).mkdir(parents=True, exist_ok=True)
@@ -468,13 +498,30 @@ class MainWindow(QMainWindow):
 
         try:
             with open(self.file_path, 'r') as f:
+                self.pattern = r'^\{"file_paths": \[(?:(?:"[^"]*",?\s*)*)\], "s_key": "([^"]+)", "f_key": "([^"]+)", "delay": \d+\.\d+\}$'
                 self.file_content = f.read().strip()
-                if self.file_content:
+                self.match = re.match(self.pattern, self.file_content)
+                if self.match:
+                    self.s_key_value = self.match.group(1)
+                    self.f_key_value = self.match.group(2)
+                if self.match and self.s_key_value.lower() in keys and self.f_key_value.lower() in keys:
                     self.data = json.loads(self.file_content)
                 else:
-                    self.data["file_paths"] = []
+                    self.data = {
+                        "file_paths": [],
+                        "s_key": "",
+                        "f_key": "",
+                        "delay": 0.7
+                    }
+                    self.save_data()
         except json.JSONDecodeError:
-            self.data["file_paths"] = []
+            self.data = {
+                "file_paths": [],
+                "s_key": "",
+                "f_key": "",
+                "delay": 0.7
+            }
+            self.save_data()
 
         self.fill_grid()
         self.set_keys()
@@ -502,9 +549,32 @@ class MainWindow(QMainWindow):
             self.i += 1
 
     def set_keys(self):
-        self.ui.SuccessKey.setText(self.data["s_key"].upper())
-        self.ui.FalseKey.setText(self.data["f_key"].upper())
-        self.ui.DelayInput.setText(str(self.data["delay"]))
+        if self.data["s_key"] == 'Backspace' or self.data["s_key"] == 'Enter':
+            self.ui.SuccessKey.setText(self.data["s_key"])
+            self.ui.SuccessKey.setStyleSheet("#SuccessKey {\n"
+                                             "background-color: rgba(0, 0, 0, 0.4);\n"
+                                             "border-radius: 8px;\n"
+                                             "font: 8pt \"Sitka\";\n"
+                                             "}\n"
+                                             "#SuccessKey:hover {\n"
+                                             "background-color: rgba(0, 0, 0, 0.25);\n"
+                                             "}")
+
+        elif self.data["f_key"] == 'Backspace' or self.data["f_key"] == 'Enter':
+            self.ui.FalseKey.setText(self.data["f_key"])
+            self.ui.FalseKey.setStyleSheet("#FalseKey {\n"
+                                           "background-color: rgba(0, 0, 0, 0.4);\n"
+                                           "border-radius: 8px;\n"
+                                           "font: 8pt \"Sitka\";\n"
+                                           "}\n"
+                                           "#FalseKey:hover {\n"
+                                           "background-color: rgba(0, 0, 0, 0.25);\n"
+                                           "}")
+        else:
+            self.ui.FalseKey.setText(self.data["f_key"])
+            self.ui.FalseKey.setText(self.data["s_key"])
+        if self.data["delay"] != 0.7:
+            self.ui.DelayInput.setText(str(self.data["delay"]))
 
     def update_status(self):
         if self.data["file_paths"] and self.data["s_key"] != "" and self.data[

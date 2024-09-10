@@ -71,7 +71,7 @@ background-color: rgba(0, 0, 0, 0.5);
      <string>Clear All</string>
     </property>
     <property name="icon">
-     <iconset resource="icons.qrc">
+     <iconset>
       <normaloff>:/Remove/icons/remove.png</normaloff>:/Remove/icons/remove.png</iconset>
     </property>
    </widget>
@@ -107,7 +107,7 @@ background-color: rgba(0, 0, 0, 0.7);
      <string>Start</string>
     </property>
     <property name="icon">
-     <iconset resource="icons.qrc">
+     <iconset>
       <normaloff>:/Start/icons/start.png</normaloff>:/Start/icons/start.png</iconset>
     </property>
    </widget>
@@ -870,7 +870,7 @@ background-color: rgba(0, 0, 0, 0.5);
      <string>Stop</string>
     </property>
     <property name="icon">
-     <iconset resource="icons.qrc">
+     <iconset>
       <normaloff>:/Stop/icons/stop.png</normaloff>:/Stop/icons/stop.png</iconset>
     </property>
    </widget>
@@ -1051,7 +1051,7 @@ border: none;
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="icons.qrc">
+     <iconset>
       <normaloff>:/Close/icons/close.png</normaloff>:/Close/icons/close.png</iconset>
     </property>
     <property name="iconSize">
@@ -1078,7 +1078,7 @@ border: none;</string>
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="icons.qrc">
+     <iconset>
       <normaloff>:/Minimize/icons/minimize.png</normaloff>:/Minimize/icons/minimize.png</iconset>
     </property>
     <property name="iconSize">
@@ -1274,7 +1274,7 @@ background-color: rgba(0, 0, 0, 0.25);
      <set>Qt::AlignmentFlag::AlignCenter</set>
     </property>
     <property name="placeholderText">
-     <string>0,7</string>
+     <string>0.7</string>
     </property>
     <property name="cursorMoveStyle">
      <enum>Qt::CursorMoveStyle::LogicalMoveStyle</enum>
@@ -1342,7 +1342,7 @@ background-color: rgba(0, 0, 0, 0.2);
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="icons.qrc">
+     <iconset>
       <normaloff>:/Info/icons/info.png</normaloff>:/Info/icons/info.png</iconset>
     </property>
     <property name="iconSize">
@@ -1391,7 +1391,7 @@ padding: 1px;
   </widget>
  </widget>
  <resources>
-  <include location="icons.qrc"/>
+  <include location="../Icons/icons.qrc"/>
  </resources>
  <connections/>
 </ui>
