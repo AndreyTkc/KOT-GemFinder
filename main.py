@@ -466,8 +466,7 @@ class MainWindow(QMainWindow):
         global is_enabled
         if not self.is_enabled:
             self.is_enabled = True
-            # self.thread_pool.start(self.start)
-            self.start()
+            self.thread_pool.start(self.start)
     def save_data(self):
         self.file_path = Path.home() / "AppData" / "Local" / "KOT Gem Finder"
         pathlib.Path(self.file_path).mkdir(parents=True, exist_ok=True)
@@ -571,8 +570,8 @@ class MainWindow(QMainWindow):
                                            "background-color: rgba(0, 0, 0, 0.25);\n"
                                            "}")
         else:
+            self.ui.SuccessKey.setText(self.data["s_key"])
             self.ui.FalseKey.setText(self.data["f_key"])
-            self.ui.FalseKey.setText(self.data["s_key"])
         if self.data["delay"] != 0.7:
             self.ui.DelayInput.setText(str(self.data["delay"]))
 
