@@ -4,14 +4,12 @@ import re
 from PySide6.QtCore import *
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
-from PySide6 import QtGui
 from Windows.main_window_ui import Ui_MainWindow
-import Icons.icons_rc
 import cv2
+import pygetwindow as gw
 import numpy as np
 import pyautogui
 import time
-import keyboard
 from PIL import ImageGrab
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
@@ -39,7 +37,7 @@ class MainWindow(QMainWindow):
         self.tracking_false_key = False
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.thread_pool = QThreadPool()
         self.ui.TipSKey.setHidden(True)
         self.ui.TipFKey.setHidden(True)
@@ -52,7 +50,6 @@ class MainWindow(QMainWindow):
         # Hint events
         self.ui.SuccessKey.installEventFilter(self)
         self.ui.FalseKey.installEventFilter(self)
-        self.ui.DelayInput.installEventFilter(self)
         self.ui.InfoBtn.installEventFilter(self)
         # Close button actions
         self.ui.CloseBtn.clicked.connect(self.close)
@@ -101,6 +98,8 @@ class MainWindow(QMainWindow):
 
         self.get_data()
 
+        self.ui.DelayInput.installEventFilter(self)
+
     def round_corners(self, radius):
         path = QPainterPath()
         rect = QRect(0, 0, self.width(), self.height())
@@ -122,100 +121,110 @@ class MainWindow(QMainWindow):
         global is_taken
         global data
         if obj == self.ui.CloseBtn:
-            if ev.type() == QEvent.Enter:
+            if ev.type() == QEvent.Type.Enter:
                 icon = QIcon()
                 icon.addFile(":Close/icons/close_hover.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
                 self.ui.CloseBtn.setIcon(icon)
                 self.ui.CloseBtn.setIconSize(QSize(20, 20))
-            elif ev.type() == QEvent.Leave:
+            elif ev.type() == QEvent.Type.Leave:
                 icon = QIcon()
                 icon.addFile(":Close/icons/close.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
                 self.ui.CloseBtn.setIcon(icon)
                 self.ui.CloseBtn.setIconSize(QSize(20, 20))
         elif obj == self.ui.MinimizeBtn:
-            if ev.type() == QEvent.Enter:
+            if ev.type() == QEvent.Type.Enter:
                 icon = QIcon()
                 icon.addFile(":Minimize/icons/minimize_hover.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
                 self.ui.MinimizeBtn.setIcon(icon)
                 self.ui.MinimizeBtn.setIconSize(QSize(20, 20))
-            elif ev.type() == QEvent.Leave:
+            elif ev.type() == QEvent.Type.Leave:
                 icon = QIcon()
                 icon.addFile(":Minimize/icons/minimize.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
                 self.ui.MinimizeBtn.setIcon(icon)
                 self.ui.MinimizeBtn.setIconSize(QSize(20, 20))
         elif obj == self.ui.SuccessKey and self.is_frozen:
-            if ev.type() == QEvent.Enter:
+            if ev.type() == QEvent.Type.Enter:
                 self.ui.TipSKey.setHidden(False)
-            elif ev.type() == QEvent.Leave:
+            elif ev.type() == QEvent.Type.Leave:
                 self.ui.TipSKey.setHidden(True)
         elif obj == self.ui.FalseKey and self.is_frozen:
-            if ev.type() == QEvent.Enter:
+            if ev.type() == QEvent.Type.Enter:
                 self.ui.TipFKey.setHidden(False)
-            elif ev.type() == QEvent.Leave:
+            elif ev.type() == QEvent.Type.Leave:
                 self.ui.TipFKey.setHidden(True)
         elif obj == self.ui.InfoBtn:
-            if ev.type() == QEvent.Enter:
+            if ev.type() == QEvent.Type.Enter:
                 self.ui.InfoTip.setHidden(False)
-            elif ev.type() == QEvent.Leave:
+            elif ev.type() == QEvent.Type.Leave:
                 self.ui.InfoTip.setHidden(True)
-        elif obj == self.ui.DelayInput and not self.is_frozen:
+        elif obj == self.ui.DelayInput and not self.is_frozen and not self.is_taken:
             self.is_taken = True
-            if ev.type() == QEvent.Enter:
+            if ev.type() == QEvent.Type.Enter:
                 self.ui.TipDelay.setHidden(False)
-            elif ev.type() == QEvent.Leave:
+            elif ev.type() == QEvent.Type.Leave:
                 self.ui.TipDelay.setHidden(True)
-            elif ev.type() == QEvent.FocusIn:
+                self.is_taken = False
+            elif ev.type() == QEvent.Type.FocusIn:
                 self.is_taken = True
-            elif ev.type() == QEvent.FocusOut:
+            elif ev.type() == QEvent.Type.FocusOut:
                 if self.ui.DelayInput.text() in ["0,", "0,00", "0,000", "00,0", "000,0", "00,00", "0.", "0.00",
                                                  "0.000", "00.0", "000.0", "00.00"]:
                     self.ui.DelayInput.setText("0")
                     self.data["delay"] = 0
+                    self.is_taken = False
                     return False
                 elif self.ui.DelayInput.text() in ["0"]:
                     if self.ui.DelayInput.text().lstrip('0') == "":
                         self.ui.DelayInput.setText("0")
                         self.data["delay"] = 0
+                        self.is_taken = False
                         return False
                 elif self.ui.DelayInput.text() == "":
                     self.ui.DelayInput.setText("")
                     self.data["delay"] = 0.7
                     self.ui.DelayInput.clearFocus()
                     self.ui.TipDelayError.setHidden(True)
+                    self.is_taken = False
                     return False
                 else:
                     self.data["delay"] = float(self.ui.DelayInput.text().replace(",", "."))
                     self.ui.DelayInput.clearFocus()
                     self.ui.TipDelayError.setHidden(True)
+                    self.is_taken = False
                     return False
                 self.update_status()
                 self.is_taken = False
-            elif ev.type() == QEvent.KeyPress:
+            elif ev.type() == QEvent.Type.KeyPress:
                 key = ev.key()
-                if key == Qt.Key_Escape or key == Qt.Key_Enter or key == Qt.Key_Return:
+                self.is_taken = True
+                if key == Qt.Key.Key_Escape or key == Qt.Key.Key_Enter or key == Qt.Key.Key_Return:
                     if self.ui.DelayInput.text() in ["0,", "0,00", "0,000", "00,0", "000,0", "00,00", "0.", "0.00",
                                                      "0.000", "00.0", "000.0", "00.00"]:
                         self.ui.DelayInput.setText("0")
                         self.data["delay"] = 0
+                        self.is_taken = False
                         return False
                     elif self.ui.DelayInput.text() in ["0"]:
                         if self.ui.DelayInput.text().lstrip('0') == "":
                             self.ui.DelayInput.setText("0")
                             self.data["delay"] = 0
+                            self.is_taken = False
                             return False
                     elif self.ui.DelayInput.text() == "":
                         self.ui.DelayInput.setText("")
                         self.data["delay"] = 0.7
                         self.ui.DelayInput.clearFocus()
                         self.ui.TipDelayError.setHidden(True)
+                        self.is_taken = False
                         return False
                     self.update_status()
                     self.is_taken = False
+        self.is_taken = False
         return False
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton and not self.is_taken:
-            self.oldPos = event.globalPos()
+            self.oldPos = event.globalPosition().toPoint()
         elif event.button() == Qt.MouseButton.LeftButton and self.is_taken:
             if self.ui.DelayInput.text() in ["0,", "0,00", "0,000", "00,0", "000,0", "00,00", "0.", "0.00",
                                              "0.000", "00.0", "000.0", "00.00"]:
@@ -239,10 +248,10 @@ class MainWindow(QMainWindow):
         return False
 
     def mouseMoveEvent(self, event):
-        if self.oldPos is not None:
-            delta = event.globalPos() - self.oldPos
+        if self.oldPos is not None and not self.is_taken:
+            delta = event.globalPosition().toPoint() - self.oldPos
             self.move(self.pos() + delta)
-            self.oldPos = event.globalPos()
+            self.oldPos = event.globalPosition().toPoint()
         return False
 
     def mouseReleaseEvent(self, event):
@@ -371,11 +380,11 @@ class MainWindow(QMainWindow):
     def keyPressEvent(self, event):
         global data
         if self.tracking_success_key:
-            if event.type() == QEvent.KeyPress:
+            if event.type() == QEvent.Type.KeyPress:
                 key = event.key()
                 key_text = event.text()
 
-                if key == Qt.Key_Escape:
+                if key == Qt.Key.Key_Escape:
                     self.ui.SuccessKey.setText("")
                     self.data["s_key"] = ""
                 else:
@@ -416,11 +425,11 @@ class MainWindow(QMainWindow):
                         self.update_status()
                 self.tracking_success_key = False
         elif self.tracking_false_key:
-            if event.type() == QEvent.KeyPress:
+            if event.type() == QEvent.Type.KeyPress:
                 key = event.key()
                 key_text = event.text()
 
-                if key == Qt.Key_Escape:
+                if key == Qt.Key.Key_Escape:
                     self.ui.FalseKey.setText("")
                     self.data["f_key"] = ""
                 else:
@@ -467,6 +476,7 @@ class MainWindow(QMainWindow):
         if not self.is_enabled:
             self.is_enabled = True
             self.thread_pool.start(self.start)
+
     def save_data(self):
         self.file_path = Path.home() / "AppData" / "Local" / "KOT Gem Finder"
         pathlib.Path(self.file_path).mkdir(parents=True, exist_ok=True)
@@ -597,7 +607,7 @@ class MainWindow(QMainWindow):
         self.ui.FalseKey.setEnabled(False)
         self.ui.DelayInput.setEnabled(False)
         while self.is_enabled:
-            self.window_title = str(pyautogui.getActiveWindowTitle())
+            self.window_title = str(gw.getActiveWindow().title)
             for file_path in self.data["file_paths"]:
                 self.image = cv2.imread(file_path)
                 if self.image is None:
