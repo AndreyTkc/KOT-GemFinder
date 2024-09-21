@@ -616,31 +616,31 @@ class MainWindow(QMainWindow):
                                                      "Error", 0x10)
                     self.stop()
                     return False
+            
+            if self.window_title == "Gem Finder":
+                time.sleep(2)
             else:
-                if self.window_title == "Gem Finder":
-                    time.sleep(2)
+                self.match_threshold = 0.9
+
+                time.sleep(self.data["delay"])
+
+                self.start_time = time.time()
+
+                self.found = self.find_any_image_on_screen(self.data["file_paths"], self.match_threshold)
+
+                self.end_time = time.time()
+                self.elapsed_time = self.end_time - self.start_time
+                self.current_time = datetime.now().strftime("%H:%M:%S")
+
+                if self.found:
+                    print(f"Golden gem found! [{self.current_time}]   Search time: {self.elapsed_time:.2f} seconds")
+                    pyautogui.press((self.data["s_key"]).lower())
+                    time.sleep(0.5)
+                    self.stop()
+                    return False
                 else:
-                    self.match_threshold = 0.9
-
-                    time.sleep(self.data["delay"])
-
-                    self.start_time = time.time()
-
-                    self.found = self.find_any_image_on_screen(self.data["file_paths"], self.match_threshold)
-
-                    self.end_time = time.time()
-                    self.elapsed_time = self.end_time - self.start_time
-                    self.current_time = datetime.now().strftime("%H:%M:%S")
-
-                    if self.found:
-                        print(f"Golden gem found! [{self.current_time}]   Search time: {self.elapsed_time:.2f} seconds")
-                        pyautogui.press((self.data["s_key"]).lower())
-                        time.sleep(0.5)
-                        self.stop()
-                        return False
-                    else:
-                        print(f"Skip... [{self.current_time}]   Search time: {self.elapsed_time:.2f} seconds")
-                        pyautogui.press((self.data["f_key"]).lower())
+                    print(f"Skip... [{self.current_time}]   Search time: {self.elapsed_time:.2f} seconds")
+                    pyautogui.press((self.data["f_key"]).lower())
 
     def stop(self):
         global is_enabled
