@@ -1,0 +1,4 @@
+.idea
+venv
+Windows/ui_to_py.bat
+Icons/qrc_to_py.bat
